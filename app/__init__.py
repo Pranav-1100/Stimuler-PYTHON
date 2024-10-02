@@ -9,7 +9,7 @@ from .utils.redis_client import get_redis_client
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
-    
+
      # Initialize CORS
     CORS(app)
 
@@ -37,7 +37,7 @@ def create_app():
     api.add_resource(GenerateDummyData, '/generate-dummy-data')
 
     # Initialize Redis inside the application context
-    with app.app_context():
-        app.redis = get_redis_client()
+    # with app.app_context():
+    #     app.redis = get_redis_client()
 
     return app

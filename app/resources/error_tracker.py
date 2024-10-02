@@ -24,33 +24,34 @@ class ErrorUpdate(Resource):
         user_id = str(user['_id'])
         
         # Try to get tracker data from Redis cache
-        cached_tracker = current_app.redis.get(f"error_tracker:{user_id}")
-        
-        if cached_tracker:
-            tracker_data = json.loads(cached_tracker)
+        # cached_tracker = current_app.redis.get(f"error_tracker:{user_id}")  # Commented out Redis cache
+
+        # Simulating cache retrieval
+        # if cached_tracker:
+        #     tracker_data = json.loads(cached_tracker)
+        #     tracker = SortedArrayTracker()
+        #     tracker.error_map = defaultdict(int, tracker_data['error_map'])
+        #     tracker.sorted_errors = tracker_data['sorted_errors']
+        # else:
+        user_tracker = current_app.db.error_trackers.find_one({'user_id': user_id})
+        if not user_tracker:
             tracker = SortedArrayTracker()
-            tracker.error_map = defaultdict(int, tracker_data['error_map'])
-            tracker.sorted_errors = tracker_data['sorted_errors']
         else:
-            user_tracker = current_app.db.error_trackers.find_one({'user_id': user_id})
-            if not user_tracker:
-                tracker = SortedArrayTracker()
-            else:
-                tracker = SortedArrayTracker()
-                tracker.error_map = defaultdict(int, user_tracker.get('error_map', {}))
-                tracker.sorted_errors = user_tracker.get('sorted_errors', [])
+            tracker = SortedArrayTracker()
+            tracker.error_map = defaultdict(int, user_tracker.get('error_map', {}))
+            tracker.sorted_errors = user_tracker.get('sorted_errors', [])
 
         tracker.update_error(data['error_category'], data['error_subcategory'])
 
         # Update Redis cache
-        current_app.redis.set(
-            f"error_tracker:{user_id}",
-            json.dumps({
-                'error_map': dict(tracker.error_map),
-                'sorted_errors': tracker.sorted_errors
-            }),
-            ex=3600  # Cache for 1 hour
-        )
+        # current_app.redis.set(  # Commented out Redis cache update
+        #     f"error_tracker:{user_id}",
+        #     json.dumps({
+        #         'error_map': dict(tracker.error_map),
+        #         'sorted_errors': tracker.sorted_errors
+        #     }),
+        #     ex=3600  # Cache for 1 hour
+        # )
 
         # Update MongoDB
         current_app.db.error_trackers.update_one(
@@ -81,30 +82,31 @@ class TopErrors(Resource):
         user_id = str(user['_id'])
 
         # Try to get tracker data from Redis cache
-        cached_tracker = current_app.redis.get(f"error_tracker:{user_id}")
-        
-        if cached_tracker:
-            tracker_data = json.loads(cached_tracker)
-            tracker = SortedArrayTracker()
-            tracker.error_map = defaultdict(int, tracker_data['error_map'])
-            tracker.sorted_errors = tracker_data['sorted_errors']
-        else:
-            user_tracker = current_app.db.error_trackers.find_one({'user_id': user_id})
-            if not user_tracker:
-                return {'errors': []}, 200
-            tracker = SortedArrayTracker()
-            tracker.error_map = defaultdict(int, user_tracker.get('error_map', {}))
-            tracker.sorted_errors = user_tracker.get('sorted_errors', [])
+        # cached_tracker = current_app.redis.get(f"error_tracker:{user_id}")  # Commented out Redis cache
 
-            # Update Redis cache
-            current_app.redis.set(
-                f"error_tracker:{user_id}",
-                json.dumps({
-                    'error_map': dict(tracker.error_map),
-                    'sorted_errors': tracker.sorted_errors
-                }),
-                ex=3600  # Cache for 1 hour
-            )
+        # Simulating cache retrieval
+        # if cached_tracker:
+        #     tracker_data = json.loads(cached_tracker)
+        #     tracker = SortedArrayTracker()
+        #     tracker.error_map = defaultdict(int, tracker_data['error_map'])
+        #     tracker.sorted_errors = tracker_data['sorted_errors']
+        # else:
+        user_tracker = current_app.db.error_trackers.find_one({'user_id': user_id})
+        if not user_tracker:
+            return {'errors': []}, 200
+        tracker = SortedArrayTracker()
+        tracker.error_map = defaultdict(int, user_tracker.get('error_map', {}))
+        tracker.sorted_errors = user_tracker.get('sorted_errors', [])
+
+        # Update Redis cache
+        # current_app.redis.set(  # Commented out Redis cache update
+        #     f"error_tracker:{user_id}",
+        #     json.dumps({
+        #         'error_map': dict(tracker.error_map),
+        #         'sorted_errors': tracker.sorted_errors
+        #     }),
+        #     ex=3600  # Cache for 1 hour
+        # )
 
         top_errors = tracker.get_top_n_errors(n)
 
@@ -146,14 +148,14 @@ class GenerateDummyData(Resource):
             tracker.update_error(category, subcategory)
 
         # Update Redis cache
-        current_app.redis.set(
-            f"error_tracker:{user_id}",
-            json.dumps({
-                'error_map': dict(tracker.error_map),
-                'sorted_errors': tracker.sorted_errors
-            }),
-            ex=3600  # Cache for 1 hour
-        )
+        # current_app.redis.set(  # Commented out Redis cache update
+        #     f"error_tracker:{user_id}",
+        #     json.dumps({
+        #         'error_map': dict(tracker.error_map),
+        #         'sorted_errors': tracker.sorted_errors
+        #     }),
+        #     ex=3600  # Cache for 1 hour
+        # )
 
         # Update MongoDB
         current_app.db.error_trackers.update_one(
