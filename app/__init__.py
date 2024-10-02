@@ -10,22 +10,17 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
 
-     # Initialize CORS
     CORS(app)
 
     print("MONGO_URI:", app.config['MONGO_URI'])
 
-    # Initialize MongoDB with connection pooling
     app.mongo = MongoClient(app.config['MONGO_URI'], maxPoolSize=100)
     app.db = app.mongo.get_default_database()
 
-    # Initialize JWT
     jwt = JWTManager(app)
 
-    # Initialize API
     api = Api(app)
 
-    # Import and register resources
     from .resources.auth import UserRegister, UserLogin, TokenRefresh
     from app.resources.error_tracker import ErrorUpdate, TopErrors, GenerateDummyData
 

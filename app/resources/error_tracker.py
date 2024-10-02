@@ -53,7 +53,6 @@ class ErrorUpdate(Resource):
         #     ex=3600  # Cache for 1 hour
         # )
 
-        # Update MongoDB
         current_app.db.error_trackers.update_one(
             {'user_id': user_id},
             {
@@ -131,7 +130,6 @@ class GenerateDummyData(Resource):
 
         user_id = str(user['_id'])
         
-        # Define error categories and subcategories
         error_categories = ['Grammar', 'Vocabulary', 'Pronunciation', 'Fluency']
         error_subcategories = {
             'Grammar': ['Verb Tense', 'Subject-Verb Agreement', 'Article Usage', 'Prepositions', 'Word Order'],
@@ -140,7 +138,6 @@ class GenerateDummyData(Resource):
             'Fluency': ['Hesitation', 'Repetition', 'Self-Correction', 'Filler Words', 'Pausing']
         }
 
-        # Generate 1000 random errors
         tracker = SortedArrayTracker()
         for _ in range(1000):
             category = random.choice(error_categories)

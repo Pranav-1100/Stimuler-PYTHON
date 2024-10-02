@@ -12,14 +12,11 @@ class SortedArrayTracker:
         self.error_map[error_key] += 1
         count = self.error_map[error_key]
 
-        # Binary search to find the position of the error
         index = self._binary_search(count, error_key)
 
         if index < len(self.sorted_errors) and self.sorted_errors[index][1] == error_key:
-            # Update existing error
             self.sorted_errors[index] = (count, error_key)
         else:
-            # Insert new error
             if len(self.sorted_errors) < self.max_errors:
                 bisect.insort(self.sorted_errors, (count, error_key), key=lambda x: (-x[0], x[1]))
             elif count > self.sorted_errors[-1][0]:
